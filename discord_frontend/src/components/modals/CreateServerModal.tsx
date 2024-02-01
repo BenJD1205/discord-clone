@@ -1,5 +1,9 @@
 import { useState } from "react";
 import { Modal, Text, Stack, Flex, Group, rem, Button, Image, TextInput } from "@mantine/core";
+import { useMutation } from "@apollo/client";
+import { CREATE_SERVER } from "../../graphql/mutations/server/CreateServer";
+import { useProfileStore } from "../../stores/profileStore";
+import { CreateServerMutation, CreateServerMutationVariables } from "../../gql/graphql";
 import { Dropzone, IMAGE_MIME_TYPE, DropzoneProps } from '@mantine/dropzone'
 import { useForm } from '@mantine/form'
 import {IconUpload, IconX} from '@tabler/icons-react'
@@ -10,6 +14,7 @@ export const CreateServerModal = () => {
     const [file, setFile] = useState<File | null>(null)
     const [imgPreview, setImgPreview] = useState<string | null>(null)
     const { isOpen, closeModal } = useModal('CreateServer')
+    const profileId = useProfileStore((state) => state.profile?.id)
     const form = useForm({
         initialValues: {
             name:'',
@@ -18,6 +23,31 @@ export const CreateServerModal = () => {
             name:(value) => !value.trim() && 'Please enter a name'
         }
     })
+    const [createServer] = useMutation<
+    CreateServerMutation,
+    CreateServerMutationVariables>(CREATE_SERVER)
+    
+    const onSubmit = () => {
+    if (!form.validate()) return
+
+    createServer({
+      variables: {
+        input: {
+          name: form.values.name,
+          profileId,
+        },
+        file,
+      },
+      onCompleted: () => {
+        setImgPreview(null)
+        setFile(null)
+        form.reset
+        closeModal()
+      },
+
+      refetchQueries: ["GetServers"],
+    })
+  }
 
     const handleDropzoneChange: DropzoneProps["onDrop"] = (files) => {
         if (files.length === 0) {
@@ -30,16 +60,15 @@ export const CreateServerModal = () => {
         setFile(files[0])
         reader.readAsDataURL(files[0])
     }
-    console.log(file)
 
     return <Modal title='Create a server' opened={isOpen} onClose={closeModal}>
         <Text c='dimmed'>
             Give your sever a personality with a name and an image. You can always change it later.
         </Text>
-        <form onSubmit={form.onSubmit(() => { })}>
+        <form onSubmit={form.onSubmit(() => onSubmit())}>
             <Stack>
                 <Flex justify='center' align='center' direction={'column'}>
-                    <Stack>
+                    <Stack style={{width:'100%'}}>
                         <Flex justify='center' align='center' direction={'column'}>
                             {!imgPreview && (
                                 <Dropzone onDrop={(files) => handleDropzoneChange(files)} className={classes.dropzone} accept={IMAGE_MIME_TYPE} mt='md'>

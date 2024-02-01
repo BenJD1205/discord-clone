@@ -14,7 +14,6 @@ export class GraphqlAuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext) {
     const gqlCtx = context.getArgByIndex(2);
     const request: Request = gqlCtx.req;
-
     const token = this.extractToken(request);
 
     if (!token) throw new UnauthorizedException('Not authorized!');

@@ -4,7 +4,7 @@ import { onError } from "@apollo/client/link/error"
 import { InMemoryCache } from "@apollo/client/cache"
 import { ApolloClient, ApolloLink, split } from "@apollo/client/core"
 import { loadErrorMessages, loadDevMessages } from "@apollo/client/dev"
-import { getMainDefinition } from "@apollo/client/utilities"
+// import { getMainDefinition } from "@apollo/client/utilities"
 
 loadDevMessages()
 loadErrorMessages()
@@ -18,6 +18,7 @@ const getToken = (name: string) => {
 // auth link
 const authLink = setContext(async (_, { headers }) => {
   const token = getToken("__session")
+  console.log(token)
   return {
     headers: {
       ...headers,
@@ -64,34 +65,22 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
   }
 })
 
-const splitLink = split(
-  ({ query }) => {
-    const definition = getMainDefinition(query)
-    return (
-      definition.kind === "OperationDefinition" &&
-      definition.operation === "subscription"
-    )
-  },
-//   wsLink,
-  ApolloLink.from([errorLink, authLink, uploadLink])
-)
+// const splitLink = split(
+//   ({ query }) => {
+//     const definition = getMainDefinition(query)
+//     return (
+//       definition.kind === "OperationDefinition" &&
+//       definition.operation === "subscription"
+//     )
+//   },
+// //   wsLink,
+//   ApolloLink.from([errorLink, authLink, uploadLink])
+// )
 
-const cache = new InMemoryCache({
-  typePolicies: {
-    Query: {
-      fields: {
-        getMessages: {
-          merge(existing, incoming) {
-            return incoming
-          },
-        },
-      },
-    },
-  },
-})
+const cache = new InMemoryCache({})
 
 const client = new ApolloClient({
-  link: splitLink,
+  link: errorLink.concat(authLink.concat(uploadLink)),
   cache,
 })
 export default client

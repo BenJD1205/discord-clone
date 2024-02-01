@@ -1,6 +1,6 @@
 import { Field, ObjectType, registerEnumType } from '@nestjs/graphql';
-import { Member } from 'src/member/types/member.types';
-import { Profile } from 'src/profile/types/profile.types';
+import { Member } from '../../member/types/member.types';
+import { Profile } from '../../profile/types/profile.types';
 
 @ObjectType()
 export class Channel {
