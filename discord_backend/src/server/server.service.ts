@@ -45,27 +45,6 @@ export class ServerService {
     });
   }
 
-  async getServer(id: number, email: string) {
-    const profile = await this.prisma.profile.findUnique({
-      where: { email },
-    });
-    if (!profile)
-      return new ApolloError('Profile not found', 'PROFILE_NOT_FOUND');
-    const server = await this.prisma.server.findUnique({
-      where: {
-        id,
-        members: {
-          some: {
-            profileId: profile.id,
-          },
-        },
-      },
-    });
-    if (!server)
-      return new ApolloError('Profile not found', 'PROFILE_NOT_FOUND');
-    return server;
-  }
-
   async getServerByProfileEmailOfMember(email: string) {
     return this.prisma.server.findMany({
       where: {
@@ -78,5 +57,36 @@ export class ServerService {
         },
       },
     });
+  }
+
+  async getServer(id: number, email: string) {
+    const profile = await this.prisma.profile.findUnique({
+      where: { email },
+    });
+
+    if (!profile)
+      return new ApolloError('Profile not found', 'PROFILE_NOT_FOUND');
+
+    const server = await this.prisma.server.findUnique({
+      where: {
+        id,
+        members: {
+          some: {
+            profileId: profile.id,
+          },
+        },
+      },
+      include: {
+        channels: true,
+        members: {
+          include: {
+            profile: true,
+            server: true,
+          },
+        },
+      },
+    });
+    if (!server) return new ApolloError('Server not found', 'SERVER_NOT_FOUND');
+    return server;
   }
 }

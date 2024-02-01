@@ -1,8 +1,13 @@
-import React from 'react'
+import { ServerSidebar } from '../components'
+import { Outlet } from 'react-router-dom'
+
 
 const ServerLayout = () => {
   return (
-    <div>ServerLayout</div>
+    <>
+      <ServerSidebar />
+      <Outlet />
+    </>
   )
 }
 

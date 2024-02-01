@@ -1,3 +1,6 @@
 export * from './ProtectedRoute'
 export * from './navigation/sidebar/Sidebar'
 export * from './modals/CreateServerModal'
+export * from './modals/CreateChannelModal'
+export * from './navigation/server/ServerSidebar'
+export * from './navigation/mobile/MobileSidebar'

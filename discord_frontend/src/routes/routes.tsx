@@ -1,7 +1,9 @@
 import { useNavigate, Routes, Route } from 'react-router-dom'
 import {ClerkProvider} from '@clerk/clerk-react'
 import RootLayout from '../layout/RootLayout'
-import { ProtectedRoute, CreateServerModal } from '../components'
+import ServerLayout from '../layout/ServerLayout'
+import ChannelLayout from '../layout/ChannelLayout'
+import { ProtectedRoute, CreateServerModal, CreateChannelModal } from '../components'
 import Home from '../pages/Home'
 
 const RouterComponent = () => {
@@ -26,6 +28,29 @@ const RouterComponent = () => {
                         }
                     />
                 </Route>
+                <Route path="servers/:serverId" element={<ServerLayout />}>
+                    <Route
+                        index
+                        element={
+                        <ProtectedRoute>
+                            <CreateChannelModal />
+                        </ProtectedRoute>
+                        }
+                    />
+                </Route>
+                <Route
+          path="servers/:serverId/channels/:channelType/:channelId"
+          element={<ChannelLayout />}
+        >
+          <Route
+            index
+            element={
+              <ProtectedRoute>
+                <CreateChannelModal />
+              </ProtectedRoute>
+            }
+          />
+        </Route>
             </Routes>
         </ClerkProvider>
     )

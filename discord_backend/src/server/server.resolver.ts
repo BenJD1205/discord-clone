@@ -24,6 +24,16 @@ export class ServerResolver {
     );
   }
 
+  @Query(() => Server)
+  async getServer(
+    @Context() ctx: { req: Request },
+    @Args('id', { nullable: true }) id: number,
+  ) {
+    if (!ctx.req?.profile.email)
+      return new ApolloError('Profile not found', 'PROFILE_NOT_FOUND');
+    return this.serverService.getServer(id, ctx.req?.profile.email);
+  }
+
   @Mutation(() => Server)
   async createServer(
     @Args('input') input: CreateServerDto,
