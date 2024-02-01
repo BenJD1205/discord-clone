@@ -23,7 +23,7 @@ export const CreateServerModal = () => {
             name:(value) => !value.trim() && 'Please enter a name'
         }
     })
-    const [createServer] = useMutation<
+    const [createServer, {loading, error}] = useMutation<
     CreateServerMutation,
     CreateServerMutationVariables>(CREATE_SERVER)
     
@@ -82,14 +82,17 @@ export const CreateServerModal = () => {
                                         <Dropzone.Idle>
                                             <IconUpload size="3.2rem" stroke={1.5}  />
                                         </Dropzone.Idle>
-                                        <>
+                                        <Stack>
                                             <Text size="xl" inline>
                                                 Drag images here or click to select files 
                                             </Text>
                                             <Text size="sm" c="dimmed" inline mt={7}>
                                                 Upload a server icon
                                             </Text>
-                                        </>
+                                            {error?.message && !file && (
+                                                <Text c="red">{error?.message}</Text>
+                                            )}
+                                        </Stack>
                                     </Group>
                                 </Dropzone>
                             )}
@@ -112,13 +115,13 @@ export const CreateServerModal = () => {
                                         >
                                             <IconX color="white" />
                                         </Button>
-                                        <Image src={imgPreview} w={rem(150)} h={rem(150)} radius={"50%"} />
+                                        <Image src={imgPreview} width={rem(150)} height={rem(150)} radius={"50%"} />
                                     </>
                                 </Flex>
                             )}
                         </Flex>
                         <TextInput label='Server name' placeholder="Enter server name" {...form.getInputProps("name")} error={form.errors.name} />
-                        <Button disabled={!!form.errors.name} w={'30%'} type="submit" variant="gradient" mt="md">Create Server</Button>
+                        <Button disabled={!!form.errors.name || loading} w={'30%'} type="submit" variant="gradient" mt="md">Create Server</Button>
                     </Stack>
                 </Flex>
             </Stack>

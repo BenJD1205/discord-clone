@@ -7,7 +7,7 @@ export function useServers() {
   const { data: servers, loading } = useQuery<
     GetServersQuery,
     GetServersQueryVariables
-  >(GET_SERVERS)
+    >(GET_SERVERS)
 
   return { servers: servers?.getServers, loading }
 }

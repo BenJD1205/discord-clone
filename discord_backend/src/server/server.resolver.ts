@@ -12,18 +12,14 @@ import { ServerService } from './server.service';
 import { GraphqlAuthGuard } from 'src/auth/auth.guard';
 
 @Resolver()
+@UseGuards(GraphqlAuthGuard)
 export class ServerResolver {
   constructor(private readonly serverService: ServerService) {}
-
-  @UseGuards(GraphqlAuthGuard)
   @Query(() => [Server])
-  async getServers(
-    @Args('profileId') profileId: number,
-    @Context() ctx: { req: Request },
-  ) {
+  async getServers(@Context() ctx: { req: Request }) {
     if (!ctx.req?.profile.email)
       return new ApolloError('Profile not found', 'PROFILE_NOT_FOUND');
-    return this.serverService.getServerByProfileEmailOfMember(
+    return await this.serverService.getServerByProfileEmailOfMember(
       ctx.req?.profile.email,
     );
   }
