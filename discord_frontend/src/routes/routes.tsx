@@ -3,8 +3,10 @@ import {ClerkProvider} from '@clerk/clerk-react'
 import RootLayout from '../layout/RootLayout'
 import ServerLayout from '../layout/ServerLayout'
 import ChannelLayout from '../layout/ChannelLayout'
-import { ProtectedRoute, CreateServerModal, CreateChannelModal } from '../components'
+import { ProtectedRoute, CreateServerModal, CreateChannelModal, InviteModal, DeleteChannelModal } from '../components'
 import Home from '../pages/Home'
+import Channel from '../pages/Channel'
+import UpdateServerModal from '../components/modals/server/UpdateServer'
 
 const RouterComponent = () => {
     const navigate = useNavigate()
@@ -46,7 +48,11 @@ const RouterComponent = () => {
             index
             element={
               <ProtectedRoute>
+                <DeleteChannelModal />
+                <UpdateServerModal />
                 <CreateChannelModal />
+                <InviteModal />
+                <Channel />    
               </ProtectedRoute>
             }
           />

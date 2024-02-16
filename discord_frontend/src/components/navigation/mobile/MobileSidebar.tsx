@@ -15,7 +15,7 @@ export const MobileSidebar = () => {
             mb="0"
             zIndex={10}
             onClose={toggleDrawer}
-            opened={drawerOpen}
+            opened={true}
             size={rem(320)}
             position={"left"}
             withOverlay={false}

@@ -1,1 +1,1 @@
-export type Modal = 'CreateServer'
+export type Modal = 'CreateServer' | 'InvitePeople' | 'UpdateServer' | 'CreateChannel' | 'ManageMembers' | 'DeleteChannel' | 'UpdateChannel' | 'DeleteServer'

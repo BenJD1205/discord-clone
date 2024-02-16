@@ -1,6 +1,10 @@
 import { Resolver, Query, Args, Context, Mutation } from '@nestjs/graphql';
 import * as GraphQLUpload from 'graphql-upload/GraphQLUpload.js';
-import { CreateServerDto } from './dto/create-server.dto';
+import {
+  CreateServerDto,
+  UpdateServerDto,
+  CreateChannelOnServerDto,
+} from './dto/create-server.dto';
 import { ApolloError } from 'apollo-server-express';
 import { Request } from 'express';
 import { UseGuards } from '@nestjs/common';
@@ -59,5 +63,88 @@ export class ServerResolver {
     const readStream = createReadStream();
     readStream.pipe(createWriteStream(imagePath));
     return imageUrl;
+  }
+
+  @Mutation(() => Server)
+  async updateServer(
+    @Args('input') input: UpdateServerDto,
+    @Args('file', { type: () => GraphQLUpload, nullable: true })
+    file: GraphQLUpload,
+  ) {
+    let imageUrl;
+
+    if (file) {
+      imageUrl = await this.storeImageAndGetUrl(file);
+    }
+    try {
+      return this.serverService.updateServer(input, imageUrl);
+    } catch (err) {
+      throw new ApolloError(err.message, err.code);
+    }
+  }
+
+  @Mutation(() => Server)
+  async updateServerWithNewInviteCode(
+    @Args('serverId', { nullable: true }) serverId: number,
+  ) {
+    if (!serverId)
+      throw new ApolloError('Server id is required', 'SERVER_ID_REQUIRED');
+    try {
+      return this.serverService.updateServerWithNewInviteCode(serverId);
+    } catch (err) {
+      throw new ApolloError(err.message, err.code);
+    }
+  }
+
+  @Mutation(() => Server)
+  async createChannel(
+    @Args('input') input: CreateChannelOnServerDto,
+    @Context() ctx: { req: Request },
+  ) {
+    try {
+      return this.serverService.createChannel(input, ctx.req?.profile.email);
+    } catch (err) {
+      throw new ApolloError(err.message, err.code);
+    }
+  }
+
+  @Mutation(() => String)
+  async leaveServer(
+    @Args('serverId', { nullable: true }) serverId: number,
+    @Context() ctx: { req: Request },
+  ) {
+    try {
+      await this.serverService.leaveServer(serverId, ctx.req?.profile.email);
+      return 'OK';
+    } catch (err) {
+      throw new ApolloError(err.message, err.code);
+    }
+  }
+
+  @Mutation(() => String)
+  async deleteServer(
+    @Args('serverId', { nullable: true }) serverId: number,
+    @Context() ctx: { req: Request },
+  ) {
+    try {
+      return this.serverService.deleteServer(serverId, ctx.req?.profile.email);
+    } catch (err) {
+      throw new ApolloError(err.message, err.code);
+    }
+  }
+
+  @Mutation(() => String)
+  async deleteChannelFromServer(
+    @Args('channelId', { nullable: true }) channelId: number,
+    @Context() ctx: { req: Request },
+  ) {
+    try {
+      return this.serverService.deleteChannelFromServer(
+        channelId,
+        ctx.req?.profile.email,
+      );
+    } catch (err) {
+      throw new ApolloError(err.message, err.code);
+    }
   }
 }
